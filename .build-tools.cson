@@ -30,6 +30,42 @@ providers: [
         {
           project: "/home/fabian/Projects/ChessGame"
           source: "/home/fabian/Projects/ChessGame/.build-tools.cson"
+          name: "Run Specs"
+          command: "jasmine-node _spec"
+          wd: "."
+          env: {}
+          modifier:
+            dependency:
+              list: [
+                [
+                  "0"
+                  "2"
+                  "Compile"
+                ]
+                [
+                  "0"
+                  "3"
+                  "Compile Specs"
+                ]
+              ]
+              abort: true
+          stdout:
+            pty: false
+            highlighting: "nh"
+            ansi_option: "ignore"
+          stderr:
+            highlighting: "nh"
+            ansi_option: "ignore"
+          output:
+            console:
+              close_success: true
+              queue_in_buffer: true
+              stdin: false
+          version: 1
+        }
+        {
+          project: "/home/fabian/Projects/ChessGame"
+          source: "/home/fabian/Projects/ChessGame/.build-tools.cson"
           name: "Compile"
           command: "coffee -bc -o . src/*.coffee"
           wd: "."
@@ -49,6 +85,63 @@ providers: [
             console:
               close_success: true
               queue_in_buffer: false
+              stdin: false
+          version: 1
+        }
+        {
+          project: "/home/fabian/Projects/ChessGame"
+          source: "/home/fabian/Projects/ChessGame/.build-tools.cson"
+          name: "Compile Specs"
+          command: "coffee -bc -o _spec spec/*-spec.coffee"
+          wd: "."
+          env: {}
+          modifier:
+            shell:
+              command: "bash -c"
+            dependency:
+              list: [
+                [
+                  "0"
+                  "4"
+                  "Make Spec Folder"
+                ]
+              ]
+              abort: true
+          stdout:
+            pty: false
+            highlighting: "nh"
+            ansi_option: "ignore"
+          stderr:
+            highlighting: "nh"
+            ansi_option: "ignore"
+          output:
+            console:
+              close_success: true
+              queue_in_buffer: true
+              stdin: false
+          version: 1
+        }
+        {
+          project: "/home/fabian/Projects/ChessGame"
+          source: "/home/fabian/Projects/ChessGame/.build-tools.cson"
+          name: "Make Spec Folder"
+          command: "mkdir -v -p _spec && rm -fv _spec/*"
+          wd: "."
+          env: {}
+          modifier:
+            shell:
+              command: "bash -c"
+          stdout:
+            pty: false
+            highlighting: "nh"
+            ansi_option: "ignore"
+          stderr:
+            highlighting: "nh"
+            ansi_option: "ignore"
+          output:
+            console:
+              close_success: true
+              queue_in_buffer: true
               stdin: false
           version: 1
         }
