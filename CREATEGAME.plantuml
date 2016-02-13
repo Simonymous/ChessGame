@@ -1,0 +1,28 @@
+@startuml
+box "You" #LightBlue
+  actor User
+  database Identity
+  database Chain
+end box
+
+alt "Anonymous"
+  autonumber
+  User -> Identity: new Anon
+  User <-- Identity: Identity
+else "Pseudonym"
+  autonumber
+  User -> Identity: new Pseudonym
+  User <-- Identity: Identity
+else "PGP"
+  autonumber
+  User -> Identity: new PGP
+  User <-- Identity: Identity
+end
+
+create Chain
+User -> Chain: newChain
+User -> Chain: setIdentity
+User -> Identity: save
+User -> Chain: save
+
+@enduml

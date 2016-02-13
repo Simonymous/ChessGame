@@ -1,0 +1,66 @@
+@startuml
+box "You" #LightBlue
+  actor User1
+  control GameManager1
+  database Identity1
+  database Chain1
+  entity Network1
+end box
+box "Opponent" #LightGreen
+  entity Network2
+  database Chain2
+  database Identity2
+  actor User2
+end box
+
+autonumber
+
+User2 -> Network2: lookout
+activate Network2
+
+User1 -> GameManager1: registerGame
+activate GameManager1
+GameManager1 -> Chain1: getKey
+GameManager1 <-- Chain1: Key + Secret
+GameManager1 -> Identity1: getPublicKey
+GameManager1 <-- Identity1: Public Key
+GameManager1 -> Network1: propagate
+note over Network1: Key + Public Key
+deactivate GameManager1
+activate Network1
+
+Network2 --> User2: Key + Public Key
+deactivate Network2
+User1 --> User2: Secret
+
+alt "Anonymous"
+  create Identity2
+  autonumber 8
+  User2 -> Identity2: new Anon
+  User2 <-- Identity2: Identity
+else "Pseudonym"
+  create Identity2
+  autonumber 8
+  User2 -> Identity2: new Pseudonym
+  User2 <-- Identity2: Identity
+else "PGP"
+  create Identity2
+  autonumber 8
+  User2 -> Identity2: new PGP
+  User2 <-- Identity2: Identity
+end
+
+create Chain2
+User2 -> Chain2: newChain
+User2 -> Chain2: setIdentity
+User2 -> Identity2: save
+User2 -> Chain2: save
+
+User2 -> Network2: login
+note over Network2: enc(Secret) + Public Key
+GameManager1 <-- Network1: payload
+deactivate Network1
+GameManager1 -> Identity1: validatePayload
+GameManager1 -> Chain1: finishPreGame
+
+@enduml

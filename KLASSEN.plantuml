@@ -1,0 +1,102 @@
+@startuml
+package "Speicherstand" {
+  interface ChainLoader {
+    +getChain(path): Disposable<Chain>
+  }
+
+  interface Restoreable {
+    +restore(Element): Disposable<RestoredChain>
+  }
+
+  class Chain {
+    +setIdentity(Identity)
+    +validateChain(): boolean
+    +validateMove(Move, O, S)
+    +addToChain(Move, O): S
+    +restore(Element, Restoreable)
+    +save()
+    +play(): Iterator
+  }
+
+  class Iterator {
+    +getMove(): String
+  }
+
+  class Element
+  class Move
+  class RestoredChain
+
+  class NewChain --|> ChainLoader
+  class SavedChain --|> ChainLoader
+  class RestoredChain --|> Chain
+
+  Move *-- Element
+  Chain --* Element
+
+  Restoreable --o RestoredChain
+  ChainLoader --o Chain
+  Iterator --o Element
+}
+
+package "Input" {
+  interface Input {
+    +newGame(): Disposable<Input>
+    +getMove(): Disposable<Move>
+  }
+
+  interface Opponent {
+    +lookout(Key): Disposable<Response>
+    +propagate(Key,Public Key): Disposable<Response>
+    +login(Secret_enc, Public Key)
+  }
+
+  class Console --|> Input
+  Console --|> Opponent
+  class Network --|> Input
+  Network --|> Opponent
+  class Electron --|> Input
+  Electron --|> Opponent
+
+  Opponent --|> Restoreable
+
+  Input --o Move
+}
+
+package "Identität" {
+  interface Identity {
+    +getCredentials(): Credentials
+    +validate(Move): ValidatedMove
+  }
+
+  class Anon --|> Identity
+  class Pseudonym --|> Identity
+  class PGP --|> Identity
+
+  Chain --o Identity
+}
+
+package "Spiel" {
+  interface Gameplay {
+    +isValid(Move)
+  }
+
+  class GameManager {
+    +setInputs([Input])
+    +setIdentity(Identity)
+    +setChain(Chain)
+    +setGameplay(Gameplay)
+    +loadGame(Path)
+    +start()
+    +serialize()
+    +end()
+  }
+
+  class Chess --|> Gameplay
+
+  GameManager --* Chain
+  GameManager --* Identity
+  GameManager --* Gameplay
+  GameManager --* Input
+
+}
+@enduml

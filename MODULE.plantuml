@@ -1,0 +1,28 @@
+@startuml
+package "Eingabe" {
+  () Eingabe
+  [GUI] --> Eingabe
+  [Konsole] --> Eingabe
+  [Netzwerk] --> Eingabe
+}
+
+database "Identität" {
+  [Identität] --> [Generator]: generiert mit
+  [Identität] --> [Pseudo]: lädt von
+  [Identität] --> [PGP]: benutzt
+}
+
+database "Speicherstand" {
+  [Liste] --> [Lader]: lädt von
+  [Liste] --> [Prüfer]: prüft mit
+  [Prüfer] --> [Netzwerk-Lader]: stellt wieder her
+}
+
+package "Spiel" {
+  [Manager] --> Eingabe: nimmt Befehle von
+  [Manager] --> [Spielmodus]: überprüft Spielzug
+  [Manager] --> Identität: validiert mit
+  [Manager] --> Liste: lädt Spielstand von
+  Liste --> Identität: signiert mit
+}
+@enduml

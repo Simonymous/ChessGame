@@ -1,0 +1,43 @@
+@startuml
+box "You" #LightBlue
+  actor User1
+  control GameManager1
+  entity Gameplay1
+  database Chain1
+  entity Network1
+end box
+box "Opponent" #LightGreen
+  entity Network2
+  database Chain2
+  entity Gameplay2
+  control GameManager2
+  actor User2
+end box
+
+User1 -> GameManager1: makeMove
+activate GameManager1
+GameManager1 -> Gameplay1: verify
+GameManager1 <-- Gameplay1: "true"
+GameManager1 -> Chain1: signTranmission
+GameManager1 <-- Chain1: S
+GameManager1 -> Chain1: hashTranmission
+GameManager1 <-- Chain1: H
+GameManager1 -> Network1: send
+Network2 --> GameManager2: Move
+activate GameManager2
+GameManager2 -> Chain2: verifyTransmission
+GameManager2 <-- Chain2: "true"
+GameManager2 -> Gameplay2: verify
+GameManager2 <-- Gameplay2: "true"
+GameManager2 -> Chain2: addToChain
+GameManager2 <-- Chain2: S
+GameManager2 -> Chain2: hashTranmission
+GameManager2 <-- Chain2: H
+GameManager2 -> Network2: send
+GameManager2 -> User2: update
+deactivate GameManager2
+Network1 --> GameManager1: Move
+GameManager1 -> Chain1: validateMove
+GameManager1 -> User1: update
+deactivate GameManager1
+@enduml
