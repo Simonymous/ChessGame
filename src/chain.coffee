@@ -19,16 +19,20 @@ NodeRSA = require 'node-rsa'
 
 module.exports =
   class Chain
+
+    @hash: (h) ->
+      hash = Crypto.createHash 'sha256'
+      hash.update(h)
+      hash.digest('hex')
+
     constructor: ({key}) ->
-      @hash = Crypto.createHash 'sha256'
-      @hash.update(key)
       @key = null
       @opp = null
       @null_move =
         keylen: 0
         private: ''
         public: ''
-        h: @hash.digest 'hex'
+        h: Chain.hash key
       @last = @null_move
       @onerror = null
 
@@ -49,12 +53,10 @@ module.exports =
       move + '-' + @key.sign(move + '-' + @last.h, 'hex')
 
     hashTransmission: (signed_move) ->
-      @hash.update(signed_move)
-      signed_move + '-' + @hash.digest 'hex'
+      signed_move + '-' + Chain.hash signed_move
 
     hashChain: (move, xor) ->
-      @hash.update(move + '-' + xor + '-' + @last.h)
-      @hash.digest 'hex'
+      Chain.hash(move + '-' + xor + '-' + @last.h)
 
     verifyTransmissionHash: (move, signature, hash) ->
       hash is @hashTransmission(move + '-' + signature)
@@ -86,14 +88,17 @@ module.exports =
         i = i + 1
       return r
 
-    addToChain: (move, signature) ->
+    addToChain: (move, signature, _from) ->
       o = signature
       s = @signTransmission move
-      @last.next =
+      from = _from
+      from ?= @last
+      from.next ?= []
+      from.next.push
         move: move
         o: o
         s: s
         h: @hashChain move, @xor(o, s)
-        prev: @last
+        prev: from
         next: null
-      @last = @last.next
+      @last = @last.next[0] unless _from?
